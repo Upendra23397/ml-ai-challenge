@@ -1,0 +1,72 @@
+# --- Secrets (never commit API keys) ---
+bot/.env
+.env
+.env.*
+!.env.example
+!bot/.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+vendor/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# --- IDE / editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.Zone.Identifier
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Docker (local build artifacts) ---
+docker-compose.override.yml
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# Note: expanded/ is INCLUDED in git (needed for Docker build on Render)

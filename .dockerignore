@@ -1,0 +1,18 @@
+# Keep Docker image small — don't copy secrets or dev junk
+bot/.env
+.env
+.venv/
+venv/
+vendor/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+*.md
+!bot/README.md
+examples/
+engagement-*.md
+challenge-*.md
+judge_simulator.py
+magicpin-ai-challenge.zip
+*.Zone.Identifier
