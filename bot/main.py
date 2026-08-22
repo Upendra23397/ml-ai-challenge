@@ -4,24 +4,18 @@ from __future__ import annotations
 
 import os
 import time
-import uuid
-from datetime import datetime, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).parent / ".env")
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from bot.composer import compose
 from bot.conversation_state import ConversationManager
-from bot.models import (
-  ContextPushRequest,
-  ReplyRequest,
-  TickRequest,
-)
+from bot.models import ContextPushRequest, ReplyRequest, TickRequest
 from bot.reply_composer import respond
 from bot.store import ContextStore
 
@@ -34,7 +28,7 @@ conversations = ConversationManager()
 TEAM_METADATA = {
   "team_name": "Vera Builders",
   "team_members": ["Challenge Participant"],
-  "model": os.getenv("LLM_MODEL", "gemini-1.5-flash (template fallback)"),
+  "model": os.getenv("LLM_MODEL", "gemini-1.5-flash"),
   "approach": "LLM composer with trigger-variant framing, post-LLM validation, and deterministic template fallback",
   "contact_email": "vera-challenge@example.com",
   "version": "1.0.0",
@@ -50,6 +44,7 @@ async def root():
     "docs": "/docs",
     "endpoints": {
       "health": "/v1/healthz",
+      "health_render": "/healthz",
       "metadata": "/v1/metadata",
       "context": "POST /v1/context",
       "tick": "POST /v1/tick",
@@ -58,13 +53,19 @@ async def root():
   }
 
 
-@app.get("/v1/healthz")
-async def healthz():
+def _health_payload() -> dict:
   return {
     "status": "ok",
     "uptime_seconds": int(time.time() - START),
     "contexts_loaded": store.counts(),
   }
+
+
+@app.get("/healthz")
+@app.get("/v1/healthz")
+async def healthz():
+  """Render checks /healthz; magicpin spec uses /v1/healthz."""
+  return _health_payload()
 
 
 @app.get("/v1/metadata")
@@ -113,7 +114,9 @@ async def tick(body: TickRequest):
     state = conversations.get_or_create(conv_id, merchant_id, customer_id, trg_id)
     composed = compose(category, merchant, trg, customer, state.sent_bodies)
 
-    owner = merchant.get("identity", {}).get("owner_first_name", merchant.get("identity", {}).get("name", ""))
+    owner = merchant.get("identity", {}).get(
+      "owner_first_name", merchant.get("identity", {}).get("name", ""),
+    )
     template_name = f"vera_{trg.get('kind', 'generic')}_v1"
     template_params = [owner, trg.get("kind", ""), composed["body"][:50]]
 
